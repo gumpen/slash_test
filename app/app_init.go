@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/favclip/ucon"
+	"github.com/gumpen/slash_test/handler"
 )
 
 func AppInit(gae bool) *ucon.ServeMux {
@@ -18,6 +19,7 @@ func AppInit(gae bool) *ucon.ServeMux {
 		log.Printf("%#v\n", string(params))
 		w.Write([]byte("Hello World!"))
 	})
+	ucon.HandleFunc("POST", "/tapuwo", handler.Tapuwo)
 	ucon.DefaultMux.Prepare()
 	return ucon.DefaultMux
 }
