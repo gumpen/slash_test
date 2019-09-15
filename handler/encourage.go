@@ -8,6 +8,7 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -25,7 +26,17 @@ func Tapuwo(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+
 	timestamp := r.Header.Get("X-Slack-Request-Timestamp")
+	requestTime, err := strconv.ParseInt(timestamp, 10, 64)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if time.Now().Unix()-requestTime > 60*5 {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 
 	sigBaseString := "v0:" + timestamp + ":" + string(requestBody)
 
