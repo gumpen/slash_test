@@ -1,39 +1,44 @@
 package handler
 
 import (
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/hex"
+	"io/ioutil"
 	"math/rand"
 	"net/http"
+	"os"
 	"time"
 )
 
 func Tapuwo(w http.ResponseWriter, r *http.Request) {
 
-	// // authentication
-	// signingSecret := os.Getenv("SIGINING_SECRET_TAPUWO")
-	// if signingSecret == "" {
-	// 	w.WriteHeader(http.StatusInternalServerError)
-	// 	return
-	// }
+	// authentication
+	signingSecret := os.Getenv("SIGINING_SECRET_TAPUWO")
+	if signingSecret == "" {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
-	// requestBody, err := ioutil.ReadAll(r.Body)
-	// if err != nil {
-	// 	http.Error(w, err.Error(), http.StatusBadRequest)
-	// 	return
-	// }
-	// timestamp := r.Header.Get("X-Slack-Request-Timestamp")
+	requestBody, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	timestamp := r.Header.Get("X-Slack-Request-Timestamp")
 
-	// sigBaseString := "v0:" + timestamp + ":" + string(requestBody)
+	sigBaseString := "v0:" + timestamp + ":" + string(requestBody)
 
-	// mac := hmac.New(sha256.New, []byte(signingSecret))
-	// mac.Write([]byte(sigBaseString))
-	// sig := hex.EncodeToString(mac.Sum(nil))
+	mac := hmac.New(sha256.New, []byte(signingSecret))
+	mac.Write([]byte(sigBaseString))
+	sig := "v0=" + hex.EncodeToString(mac.Sum(nil))
 
-	// requestSig := r.Header.Get("X-Slack-Signature")
+	requestSig := r.Header.Get("X-Slack-Signature")
 
-	// if sig != requestSig {
-	// 	w.WriteHeader(http.StatusForbidden)
-	// 	return
-	// }
+	if sig != requestSig {
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
 
 	poetries := [...]string{
 		"だれにだってあるんだよ　ひとにはいえないくるしみが　だれにだってあるんだよ",
