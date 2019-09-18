@@ -3,7 +3,7 @@ package gae
 import (
 	"net/http"
 
-	"github.com/gumpen/slash_test/app"
+	"github.com/gumpen/slack_why_bot/app"
 )
 
 func init() {
